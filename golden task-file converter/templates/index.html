@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image to PDF Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #77bdda, #2d4db4, #3ce7de);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        label.upload-btn {
+            cursor: pointer;
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        label.upload-btn:hover {
+            background-color: #45a049;
+        }
+
+        button.convert-btn {
+            cursor: pointer;
+            background-color: #ff9800;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+
+        button.convert-btn:hover {
+            background-color: #f57c00;
+        }
+
+        .output-message {
+            color: #007bff;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JPG to PDF Converter</h1>
+        <label class="upload-btn" for="imageInput">Upload Image</label>
+        <input type="file" id="imageInput" accept="image/*">
+        <button class="convert-btn" onclick="convertToPDF()">Convert to PDF</button>
+        <div class="output-message" id="outputMessage"></div>
+    </div>
+
+    <script>
+        function convertToPDF() {
+            const imageInput = document.getElementById('imageInput');
+            const file = imageInput.files[0];
+            const formData = new FormData();
+            formData.append('image', file);
+
+            fetch('/convert', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                // Create a temporary anchor element to trigger the download
+                const a = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                a.href = url;
+                a.download = 'converted_file.pdf';
+                a.click();
+                URL.revokeObjectURL(url);
+
+                document.getElementById('outputMessage').innerText = 'Conversion successful! Download your PDF below.';
+            })
+            .catch(error => {
+                console.error('Error during conversion:', error);
+                document.getElementById('outputMessage').innerText = 'Error during conversion. Please try again.';
+            });
+        }
+    </script>
+</body>
+</html>
